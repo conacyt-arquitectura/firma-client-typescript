@@ -1,0 +1,160 @@
+openapi: 3.0.1
+info:
+  title: firma API
+  description: firma API documentation
+  contact:
+    name: Roberto Villarejo Martínez
+    email: roberto.villarejo@comimsa.com
+  license:
+    name: MIT
+  version: 0.0.1
+servers:
+- url: https://firma
+paths:
+  /api/validation/certificate:
+    post:
+      tags:
+      - firma
+      summary: validate
+      operationId: validate
+      requestBody:
+        description: certificate
+        content:
+          text/plain:
+            schema:
+              type: string
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                enum:
+                - GOOD
+                - REVOKED
+                - NOT_YET_VALID
+                - EXPIRED
+                - UNKNOWN
+        401:
+          description: Unauthorized
+          content: {}
+        403:
+          description: Forbidden
+          content: {}
+      deprecated: false
+      x-codegen-request-body-name: certificate
+  /api/validation/signature:
+    post:
+      tags:
+      - firma
+      summary: verify
+      operationId: verify
+      requestBody:
+        description: req
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifySignatureRequest'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                enum:
+                - PENDING
+                - VALIDATING
+                - ERROR
+                - VALID
+                - INVALID
+        201:
+          description: Created
+          content: {}
+        401:
+          description: Unauthorized
+          content: {}
+        403:
+          description: Forbidden
+          content: {}
+        404:
+          description: Not Found
+          content: {}
+      deprecated: false
+      x-codegen-request-body-name: req
+  /api/validation/signatures:
+    post:
+      tags:
+      - firma
+      summary: verify
+      operationId: verifyMultiple
+      requestBody:
+        description: req
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyMultipleSignatureRequest'
+        required: true
+      responses:
+        200:
+          description: OK
+          content: {}
+        201:
+          description: Created
+          content: {}
+        401:
+          description: Unauthorized
+          content: {}
+        403:
+          description: Forbidden
+          content: {}
+        404:
+          description: Not Found
+          content: {}
+      deprecated: false
+      x-codegen-request-body-name: req
+components:
+  schemas:
+    Request:
+      title: Request
+      type: object
+      properties:
+        data:
+          type: string
+        signature:
+          type: string
+    SubjectInfo:
+      title: SubjectInfo
+      type: object
+      properties:
+        certificate:
+          type: string
+        curp:
+          type: string
+        rfc:
+          type: string
+    VerifyMultipleSignatureRequest:
+      title: VerifyMultipleSignatureRequest
+      type: object
+      properties:
+        callbackUrl:
+          type: string
+        requests:
+          type: array
+          items:
+            $ref: '#/components/schemas/Request'
+        subjectInfo:
+          $ref: '#/components/schemas/SubjectInfo'
+    VerifySignatureRequest:
+      title: VerifySignatureRequest
+      type: object
+      properties:
+        data:
+          type: string
+        signature:
+          type: string
+        subjectInfo:
+          $ref: '#/components/schemas/SubjectInfo'
